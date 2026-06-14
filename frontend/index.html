@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>Cloud File Intelligence</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Tahoma, sans-serif; background: #f4f3ff; min-height: 100vh; padding: 32px 16px; }
+    .container { max-width: 620px; margin: 0 auto; }
+    h1 { color: #534AB7; font-size: 22px; margin-bottom: 4px; }
+    .subtitle { color: #888; font-size: 13px; margin-bottom: 24px; }
+    .card { background: white; border-radius: 16px; padding: 24px; margin-bottom: 16px; box-shadow: 0 2px 16px rgba(83,74,183,0.08); }
+    .dropzone { border: 2px dashed #AFA9EC; border-radius: 12px; padding: 32px 20px; text-align: center; cursor: pointer; transition: all 0.2s; background: #fafafa; margin-bottom: 16px; }
+    .dropzone:hover, .dropzone.drag { background: #f0eeff; border-color: #534AB7; }
+    .dropzone-icon { font-size: 40px; margin-bottom: 10px; }
+    .dropzone p { color: #555; font-size: 14px; margin-bottom: 4px; }
+    .dropzone span { color: #aaa; font-size: 12px; }
+    .file-types { display: flex; gap: 6px; justify-content: center; margin-top: 10px; }
+    .type-badge { font-size: 11px; padding: 2px 10px; border-radius: 20px; border: 1px solid; }
+    .type-pdf { background: #fff0f0; color: #c0392b; border-color: #f5c6c6; }
+    .type-img { background: #f0f7ff; color: #1a6fc4; border-color: #c6dcf5; }
+    .type-txt { background: #f0fff4; color: #1a7a3c; border-color: #c6f0d4; }
+    .file-preview { display: none; background: #f8f7ff; border-radius: 10px; padding: 12px 16px; margin-bottom: 16px; align-items: center; gap: 12px; border: 1px solid #e0deff; }
+    .file-preview.show { display: flex; }
+    .file-icon { font-size: 28px; }
+    .file-info { flex: 1; }
+    .file-name { font-size: 13px; font-weight: bold; color: #333; margin-bottom: 2px; }
+    .file-meta { font-size: 11px; color: #999; display: flex; gap: 10px; }
+    .remove-btn { background: none; border: none; color: #ccc; cursor: pointer; font-size: 20px; }
+    .remove-btn:hover { color: #e74c3c; }
+    .options { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+    .option { border: 1.5px solid #e0deff; border-radius: 10px; padding: 10px 8px; text-align: center; cursor: pointer; transition: all 0.15s; }
+    .option:hover { background: #f4f3ff; }
+    .option.selected { border-color: #534AB7; background: #f0eeff; }
+    .option-icon { font-size: 20px; margin-bottom: 4px; }
+    .option-label { font-size: 12px; color: #444; font-weight: bold; }
+    .option-desc { font-size: 10px; color: #999; margin-top: 2px; }
+    .progress { display: none; margin-bottom: 12px; height: 6px; background: #eee; border-radius: 10px; overflow: hidden; }
+    .progress-bar { height: 100%; background: linear-gradient(90deg, #534AB7, #7F77DD); width: 0%; transition: width 0.4s; border-radius: 10px; }
+    .btn { width: 100%; padding: 13px; background: #534AB7; color: white; border: none; border-radius: 10px; font-size: 15px; font-family: Tahoma; cursor: pointer; transition: all 0.2s; }
+    .btn:hover { background: #3C3489; }
+    .btn:disabled { background: #ccc; cursor: not-allowed; }
+    .result-box { display: none; margin-top: 16px; border-radius: 12px; overflow: hidden; border: 1px solid #e0deff; }
+    .result-tabs { display: flex; background: #f8f7ff; border-bottom: 1px solid #e0deff; }
+    .result-tab { padding: 8px 16px; font-size: 12px; font-family: Tahoma; border: none; background: none; cursor: pointer; color: #888; border-bottom: 2px solid transparent; }
+    .result-tab.active { color: #534AB7; border-bottom-color: #534AB7; font-weight: bold; }
+    .result-content { padding: 16px; font-size: 13px; line-height: 1.8; color: #333; white-space: pre-wrap; min-height: 100px; }
+    .result-content.error { color: #c0392b; background: #fff0f0; }
+    .qa-box { padding: 12px 16px; border-top: 1px solid #e0deff; display: flex; gap: 8px; }
+    .qa-input { flex: 1; padding: 8px 12px; border: 1px solid #e0deff; border-radius: 8px; font-family: Tahoma; font-size: 13px; }
+    .qa-btn { padding: 8px 16px; background: #534AB7; color: white; border: none; border-radius: 8px; font-family: Tahoma; cursor: pointer; font-size: 13px; }
+    .qa-btn:hover { background: #3C3489; }
+    .history-title { font-size: 14px; font-weight: bold; color: #534AB7; margin-bottom: 12px; }
+    .history-empty { font-size: 13px; color: #bbb; text-align: center; padding: 16px; }
+    .history-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid #f0eeff; }
+    .history-item:last-child { border-bottom: none; }
+    .history-info { flex: 1; }
+    .history-name { font-size: 13px; color: #333; font-weight: bold; margin-bottom: 2px; }
+    .history-meta { font-size: 11px; color: #aaa; }
+    .status-done { font-size: 11px; padding: 2px 8px; border-radius: 20px; background: #e1f5ee; color: #085041; }
+    .status-error { font-size: 11px; padding: 2px 8px; border-radius: 20px; background: #fcebeb; color: #791F1F; }
+    .stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+    .stat { background: #f8f7ff; border-radius: 10px; padding: 12px; text-align: center; }
+    .stat-num { font-size: 22px; font-weight: bold; color: #534AB7; }
+    .stat-label { font-size: 11px; color: #999; margin-top: 2px; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>☁️ Cloud File Intelligence</h1>
+  <p class="subtitle">فایل آپلود کن، با هوش مصنوعی تحلیل بگیر</p>
+
+  <div class="card">
+    <div class="stats">
+      <div class="stat"><div class="stat-num" id="totalCount">0</div><div class="stat-label">فایل تحلیل شده</div></div>
+      <div class="stat"><div class="stat-num" id="totalSize">0</div><div class="stat-label">مگابایت</div></div>
+      <div class="stat"><div class="stat-num" id="totalSuccess">0</div><div class="stat-label">موفق</div></div>
+    </div>
+
+    <div class="dropzone" id="dropzone" onclick="document.getElementById('fileInput').click()">
+      <div class="dropzone-icon">📁</div>
+      <p>فایل رو اینجا رها کن یا کلیک کن</p>
+      <span>حداکثر ۱۰ مگابایت</span>
+      <div class="file-types">
+        <span class="type-badge type-pdf">PDF</span>
+        <span class="type-badge type-img">PNG / JPG</span>
+        <span class="type-badge type-txt">TXT</span>
+      </div>
+      <input type="file" id="fileInput" style="display:none" accept=".pdf,.png,.jpg,.jpeg,.txt">
+    </div>
+
+    <div class="file-preview" id="filePreview">
+      <div class="file-icon" id="fileIcon">📄</div>
+      <div class="file-info">
+        <div class="file-name" id="fileName"></div>
+        <div class="file-meta"><span id="fileSize"></span><span id="fileExt"></span></div>
+      </div>
+      <button class="remove-btn" onclick="removeFile()">✕</button>
+    </div>
+
+    <div class="options">
+      <div class="option selected" data-mode="summary" onclick="selectMode(this)">
+        <div class="option-icon">📝</div>
+        <div class="option-label">خلاصه</div>
+        <div class="option-desc">متن کوتاه</div>
+      </div>
+      <div class="option" data-mode="keypoints" onclick="selectMode(this)">
+        <div class="option-icon">💡</div>
+        <div class="option-label">نکات کلیدی</div>
+        <div class="option-desc">مهم‌ترین ایده‌ها</div>
+      </div>
+      <div class="option" data-mode="qa" onclick="selectMode(this)">
+        <div class="option-icon">❓</div>
+        <div class="option-label">پرسش و پاسخ</div>
+        <div class="option-desc">سوال بپرس</div>
+      </div>
+    </div>
+
+    <div class="progress" id="progress">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <button class="btn" id="analyzeBtn" onclick="analyzeFile()" disabled>
+      ✨ تحلیل با هوش مصنوعی
+    </button>
+
+    <div class="result-box" id="resultBox">
+      <div class="result-tabs" id="resultTabs"></div>
+      <div class="result-content" id="resultContent"></div>
+      <div class="qa-box" id="qaBox" style="display:none">
+        <input class="qa-input" id="qaInput" placeholder="سوالت رو بنویس..." onkeydown="if(event.key==='Enter') askQuestion()">
+        <button class="qa-btn" onclick="askQuestion()">بپرس</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="history-title">📋 تاریخچه تحلیل‌ها</div>
+    <div id="historyList"><div class="history-empty">هنوز فایلی تحلیل نشده</div></div>
+  </div>
+</div>
+
+<script>
+  const fileIcons = { pdf:'📕', png:'🖼️', jpg:'🖼️', jpeg:'🖼️', txt:'📝' }
+  let currentMode = 'summary'
+  let currentFile = null
+  let results = {}
+  let stats = { count: 0, size: 0, success: 0 }
+  let history = []
+
+  document.getElementById('fileInput').addEventListener('change', e => handleFile(e.target.files[0]))
+  const dz = document.getElementById('dropzone')
+  dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag') })
+  dz.addEventListener('dragleave', () => dz.classList.remove('drag'))
+  dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('drag'); handleFile(e.dataTransfer.files[0]) })
+
+  function selectMode(el) {
+    document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'))
+    el.classList.add('selected')
+    currentMode = el.dataset.mode
+    if (results[currentMode]) showResult(currentMode)
+    document.getElementById('qaBox').style.display = currentMode === 'qa' ? 'flex' : 'none'
+  }
+
+  function handleFile(file) {
+    if (!file) return
+    currentFile = file
+    const ext = file.name.split('.').pop().toLowerCase()
+    document.getElementById('fileIcon').textContent = fileIcons[ext] || '📄'
+    document.getElementById('fileName').textContent = file.name
+    document.getElementById('fileSize').textContent = (file.size / 1024 / 1024).toFixed(1) + ' MB'
+    document.getElementById('fileExt').textContent = ext.toUpperCase()
+    document.getElementById('filePreview').classList.add('show')
+    document.getElementById('analyzeBtn').disabled = false
+    document.getElementById('resultBox').style.display = 'none'
+    results = {}
+  }
+
+  function removeFile() {
+    currentFile = null
+    document.getElementById('fileInput').value = ''
+    document.getElementById('filePreview').classList.remove('show')
+    document.getElementById('analyzeBtn').disabled = true
+    document.getElementById('resultBox').style.display = 'none'
+    results = {}
+  }
+
+  async function analyzeFile() {
+    if (!currentFile) return
+    setLoading(true)
+
+    const formData = new FormData()
+    formData.append('file', currentFile)
+    formData.append('mode', currentMode)
+
+    try {
+      animateProgress()
+      const res = await fetch('http://localhost:3000/analyze', { method: 'POST', body: formData })
+      const data = await res.json()
+
+      if (data.error) throw new Error(data.error)
+
+      results[currentMode] = data.result
+      showResult(currentMode)
+      updateStats(true)
+      addHistory(currentFile.name, currentFile.size, true)
+    } catch (err) {
+      showError('خطا: ' + err.message)
+      addHistory(currentFile.name, currentFile.size, false)
+      updateStats(false)
+    }
+
+    setLoading(false)
+  }
+
+  async function askQuestion() {
+    const q = document.getElementById('qaInput').value.trim()
+    if (!q || !currentFile) return
+    document.getElementById('qaInput').value = ''
+    setLoading(true)
+
+    const formData = new FormData()
+    formData.append('file', currentFile)
+    formData.append('mode', 'qa')
+    formData.append('question', q)
+
+    try {
+      const res = await fetch('http://localhost:3000/analyze', { method: 'POST', body: formData })
+      const data = await res.json()
+      if (data.error) throw new Error(data.error)
+      const prev = results['qa'] || ''
+      results['qa'] = prev + (prev ? '\n\n---\n\n' : '') + '❓ ' + q + '\n\n' + data.result
+      showResult('qa')
+    } catch (err) {
+      showError('خطا: ' + err.message)
+    }
+
+    setLoading(false)
+  }
+
+  function showResult(mode) {
+    const box = document.getElementById('resultBox')
+    box.style.display = 'block'
+    document.getElementById('resultContent').className = 'result-content'
+    document.getElementById('resultContent').textContent = results[mode] || 'در حال تحلیل...'
+    document.getElementById('qaBox').style.display = mode === 'qa' ? 'flex' : 'none'
+    document.getElementById('progress').style.display = 'none'
+  }
+
+  function showError(msg) {
+    const box = document.getElementById('resultBox')
+    box.style.display = 'block'
+    document.getElementById('resultContent').className = 'result-content error'
+    document.getElementById('resultContent').textContent = msg
+    document.getElementById('progress').style.display = 'none'
+  }
+
+  function setLoading(on) {
+    const btn = document.getElementById('analyzeBtn')
+    btn.disabled = on
+    btn.textContent = on ? '⏳ در حال تحلیل...' : '✨ تحلیل با هوش مصنوعی'
+    if (!on) document.getElementById('progress').style.display = 'none'
+  }
+
+  function animateProgress() {
+    const bar = document.getElementById('progressBar')
+    const prog = document.getElementById('progress')
+    prog.style.display = 'block'
+    bar.style.width = '0%'
+    setTimeout(() => bar.style.width = '40%', 100)
+    setTimeout(() => bar.style.width = '75%', 1500)
+  }
+
+  function updateStats(success) {
+    stats.count++
+    if (success) stats.success++
+    if (currentFile) stats.size += currentFile.size / 1024 / 1024
+    document.getElementById('totalCount').textContent = stats.count
+    document.getElementById('totalSize').textContent = stats.size.toFixed(1)
+    document.getElementById('totalSuccess').textContent = stats.success
+  }
+
+  function addHistory(name, size, success) {
+    history.unshift({ name, size, success, time: new Date().toLocaleTimeString('fa-IR') })
+    const list = document.getElementById('historyList')
+    list.innerHTML = history.map(h => `
+      <div class="history-item">
+        <div style="font-size:22px">${fileIcons[h.name.split('.').pop().toLowerCase()] || '📄'}</div>
+        <div class="history-info">
+          <div class="history-name">${h.name}</div>
+          <div class="history-meta">${(h.size/1024/1024).toFixed(1)} MB · ${h.time}</div>
+        </div>
+        <span class="${h.success ? 'status-done' : 'status-error'}">${h.success ? '✅ موفق' : '❌ خطا'}</span>
+      </div>
+    `).join('')
+  }
+</script>
+</body>
+</html>
