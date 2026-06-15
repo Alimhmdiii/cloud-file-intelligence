@@ -5,9 +5,16 @@ const cors = require('cors')
 const fs = require('fs')
 const OpenAI = require('openai')
 const { PdfReader } = require('pdfreader')
+const cloudinary = require('cloudinary').v2
 
 const app = express()
 const PORT = process.env.PORT || 3000
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+})
 
 const client = new OpenAI({
   baseURL: 'https://openrouter.ai/api/v1',
@@ -44,8 +51,23 @@ async function extractText(filePath, mimeType) {
         else if (item.text) text += item.text + ' '
       })
     })
-  } else {
-    return fs.readFileSync(filePath, 'utf8').substring(0, 8000)
+  }
+  return fs.readFileSync(filePath, 'utf8').substring(0, 8000)
+}
+
+async function uploadToCloudinary(filePath, mimeType) {
+  const isImage = mimeType.startsWith('image/')
+  const resourceType = isImage ? 'image' : 'raw'
+  const result = await cloudinary.uploader.upload(filePath, {
+    resource_type: resourceType,
+    folder: 'cloud-file-intelligence',
+    access_mode: 'public',
+    flags: 'attachment'
+  })
+  return {
+    url: result.secure_url,
+    publicId: result.public_id,
+    resourceType
   }
 }
 
@@ -66,8 +88,9 @@ app.post('/analyze', upload.single('file'), async (req, res) => {
   }
 
   try {
-    let messages
+    const cloudData = await uploadToCloudinary(req.file.path, mimeType)
 
+    let messages
     if (isImage) {
       const base64 = fs.readFileSync(req.file.path).toString('base64')
       messages = [{
@@ -80,6 +103,7 @@ app.post('/analyze', upload.single('file'), async (req, res) => {
     } else {
       const text = await extractText(req.file.path, mimeType)
       if (!text || text.trim().length < 10) {
+        fs.unlinkSync(req.file.path)
         return res.status(400).json({ error: 'متنی در فایل پیدا نشد' })
       }
       messages = [{
@@ -94,12 +118,32 @@ app.post('/analyze', upload.single('file'), async (req, res) => {
     })
 
     const result = response.choices[0].message.content
-    fs.unlinkSync(req.file.path)
 
-    res.json({ result, mode })
+    if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path)
+
+    res.json({
+      result,
+      mode,
+      cloudUrl: cloudData.url,
+      publicId: cloudData.publicId,
+      resourceType: cloudData.resourceType,
+      isImage
+    })
   } catch (err) {
+    if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path)
     console.error(err)
     res.status(500).json({ error: 'خطا در تحلیل: ' + err.message })
+  }
+})
+
+app.delete('/file/:publicId', async (req, res) => {
+  try {
+    const publicId = decodeURIComponent(req.params.publicId)
+    const resourceType = req.query.resourceType || 'raw'
+    await cloudinary.uploader.destroy(publicId, { resource_type: resourceType })
+    res.json({ message: 'فایل حذف شد' })
+  } catch (err) {
+    res.status(500).json({ error: 'خطا در حذف: ' + err.message })
   }
 })
 
