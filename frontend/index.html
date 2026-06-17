@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="fa" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cloud File Intelligence</title>
-  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: #eeeeff;
@@ -43,7 +43,7 @@
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: 'Vazirmatn', Tahoma, sans-serif;
+      font-family: 'Inter', sans-serif;
       background: var(--bg);
       min-height: 100vh;
       padding: 32px 16px;
@@ -55,96 +55,36 @@
     body::before {
       content: '';
       position: fixed;
-      top: -50%;
-      right: -20%;
-      width: 600px;
-      height: 600px;
+      top: -50%; right: -20%;
+      width: 600px; height: 600px;
       background: radial-gradient(circle, rgba(83,74,183,0.15) 0%, transparent 70%);
-      pointer-events: none;
-      z-index: 0;
+      pointer-events: none; z-index: 0;
     }
     body::after {
       content: '';
       position: fixed;
-      bottom: -30%;
-      left: -10%;
-      width: 500px;
-      height: 500px;
+      bottom: -30%; left: -10%;
+      width: 500px; height: 500px;
       background: radial-gradient(circle, rgba(127,119,221,0.1) 0%, transparent 70%);
-      pointer-events: none;
-      z-index: 0;
+      pointer-events: none; z-index: 0;
     }
     .container { max-width: 640px; margin: 0 auto; position: relative; z-index: 1; }
-
     .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; }
     .header-title h1 { font-size: 22px; font-weight: 700; color: var(--primary); margin-bottom: 2px; }
     .header-title p { font-size: 13px; color: var(--text-secondary); }
-    .theme-btn {
-      width: 42px; height: 42px; border-radius: 50%;
-      border: 1px solid var(--card-border);
-      background: var(--card);
-      backdrop-filter: var(--blur);
-      cursor: pointer; font-size: 18px;
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: var(--shadow);
-      transition: transform 0.2s;
-    }
+    .theme-btn { width: 42px; height: 42px; border-radius: 50%; border: 1px solid var(--card-border); background: var(--card); backdrop-filter: var(--blur); cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow); transition: transform 0.2s; }
     .theme-btn:hover { transform: rotate(20deg) scale(1.1); }
-
-    .card {
-      background: var(--card);
-      backdrop-filter: var(--blur);
-      border-radius: 24px;
-      padding: 24px;
-      margin-bottom: 16px;
-      box-shadow: var(--shadow);
-      border: 1px solid var(--card-border);
-      transition: background 0.4s;
-    }
-
+    .card { background: var(--card); backdrop-filter: var(--blur); border-radius: 24px; padding: 24px; margin-bottom: 16px; box-shadow: var(--shadow); border: 1px solid var(--card-border); transition: background 0.4s; }
     .stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-    .stat {
-      background: var(--primary-light);
-      border-radius: 14px; padding: 14px;
-      text-align: center;
-      border: 1px solid var(--border);
-      transition: transform 0.2s;
-    }
+    .stat { background: var(--primary-light); border-radius: 14px; padding: 14px; text-align: center; border: 1px solid var(--border); transition: transform 0.2s; }
     .stat:hover { transform: translateY(-2px); }
     .stat-num { font-size: 26px; font-weight: 700; color: var(--primary); }
     .stat-label { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
-
-    .dropzone {
-      border: 2px dashed var(--border);
-      border-radius: 18px; padding: 36px 20px;
-      text-align: center; cursor: pointer;
-      transition: all 0.3s;
-      background: var(--primary-light);
-      margin-bottom: 16px;
-      position: relative; overflow: hidden;
-    }
+    .dropzone { border: 2px dashed var(--border); border-radius: 18px; padding: 36px 20px; text-align: center; cursor: pointer; transition: all 0.3s; background: var(--primary-light); margin-bottom: 16px; position: relative; overflow: hidden; }
     .dropzone.drag { border-color: var(--primary); transform: scale(1.02); }
-    .upload-anim {
-      width: 70px; height: 70px;
-      margin: 0 auto 12px;
-      position: relative;
-    }
-    .upload-circle {
-      width: 70px; height: 70px;
-      border-radius: 50%;
-      background: var(--primary-light);
-      border: 2px solid var(--border);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 28px;
-      transition: all 0.3s;
-    }
-    .dropzone:hover .upload-circle, .dropzone.drag .upload-circle {
-      background: var(--primary);
-      border-color: var(--primary);
-      transform: scale(1.1);
-    }
-    .dropzone:hover .upload-icon { filter: grayscale(0); transform: translateY(-3px); }
-    .upload-icon { transition: all 0.3s; display: block; }
+    .upload-anim { width: 70px; height: 70px; margin: 0 auto 12px; }
+    .upload-circle { width: 70px; height: 70px; border-radius: 50%; background: var(--primary-light); border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 28px; transition: all 0.3s; }
+    .dropzone:hover .upload-circle, .dropzone.drag .upload-circle { background: var(--primary); border-color: var(--primary); transform: scale(1.1); }
     .dropzone p { color: var(--text-secondary); font-size: 14px; margin-bottom: 4px; font-weight: 500; }
     .dropzone span { color: var(--text-muted); font-size: 12px; }
     .file-types { display: flex; gap: 6px; justify-content: center; margin-top: 12px; }
@@ -152,13 +92,7 @@
     .type-pdf { background: #fff0f0; color: #c0392b; border-color: #f5c6c6; }
     .type-img { background: #f0f7ff; color: #1a6fc4; border-color: #c6dcf5; }
     .type-txt { background: #f0fff4; color: #1a7a3c; border-color: #c6f0d4; }
-
-    .file-preview {
-      display: none; background: var(--primary-light);
-      border-radius: 14px; padding: 14px 16px;
-      margin-bottom: 16px; align-items: center; gap: 12px;
-      border: 1px solid var(--border);
-    }
+    .file-preview { display: none; background: var(--primary-light); border-radius: 14px; padding: 14px 16px; margin-bottom: 16px; align-items: center; gap: 12px; border: 1px solid var(--border); }
     .file-preview.show { display: flex; animation: slideIn 0.3s ease; }
     @keyframes slideIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
     .file-icon { font-size: 32px; }
@@ -168,86 +102,67 @@
     .file-meta span { background: var(--card); padding: 2px 8px; border-radius: 6px; border: 1px solid var(--border); }
     .remove-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 18px; padding: 6px; border-radius: 8px; transition: all 0.2s; }
     .remove-btn:hover { color: #e74c3c; background: var(--error-bg); }
-
     .options { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 16px; }
-    .option {
-      border: 1.5px solid var(--border);
-      border-radius: 16px; padding: 14px 8px;
-      text-align: center; cursor: pointer;
-      transition: all 0.25s;
-      background: var(--card);
-    }
+    .option { border: 1.5px solid var(--border); border-radius: 16px; padding: 14px 8px; text-align: center; cursor: pointer; transition: all 0.25s; background: var(--card); }
     .option:hover { background: var(--primary-light); border-color: var(--primary); transform: translateY(-3px); box-shadow: 0 6px 16px rgba(83,74,183,0.15); }
     .option.selected { border-color: var(--primary); background: var(--primary-light); box-shadow: 0 6px 16px rgba(83,74,183,0.2); transform: translateY(-2px); }
     .option-icon { font-size: 24px; margin-bottom: 6px; }
     .option-label { font-size: 12px; color: var(--text); font-weight: 600; }
     .option-desc { font-size: 10px; color: var(--text-muted); margin-top: 3px; }
-
     .progress { display: none; margin-bottom: 14px; height: 6px; background: var(--border); border-radius: 10px; overflow: hidden; }
     .progress-bar { height: 100%; background: linear-gradient(90deg, var(--primary), #AFA9EC, var(--primary)); background-size: 200%; width: 0%; border-radius: 10px; animation: shimmerBar 2s linear infinite; }
     @keyframes shimmerBar { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-
-    .btn {
-      width: 100%; padding: 14px;
-      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-      color: white; border: none; border-radius: 14px;
-      font-size: 15px; font-family: 'Vazirmatn', Tahoma;
-      font-weight: 600; cursor: pointer;
-      transition: all 0.25s;
-      box-shadow: 0 4px 16px rgba(83,74,183,0.3);
-    }
+    .btn { width: 100%; padding: 14px; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; border: none; border-radius: 14px; font-size: 15px; font-family: 'Inter', sans-serif; font-weight: 600; cursor: pointer; transition: all 0.25s; box-shadow: 0 4px 16px rgba(83,74,183,0.3); }
     .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(83,74,183,0.4); }
     .btn:active { transform: translateY(0); }
     .btn:disabled { background: var(--text-muted); cursor: not-allowed; transform: none; box-shadow: none; }
-
     .skeleton { background: linear-gradient(90deg, var(--border) 25%, var(--primary-light) 50%, var(--border) 75%); background-size: 200% 100%; animation: skeletonAnim 1.5s infinite; border-radius: 8px; height: 14px; margin-bottom: 10px; }
     @keyframes skeletonAnim { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-
     .result-box { display: none; margin-top: 16px; border-radius: 18px; overflow: hidden; border: 1px solid var(--card-border); animation: fadeIn 0.4s ease; box-shadow: var(--shadow); }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     .result-tabs { display: flex; background: var(--primary-light); border-bottom: 1px solid var(--border); }
-    .result-tab { padding: 10px 16px; font-size: 12px; font-family: 'Vazirmatn', Tahoma; border: none; background: none; cursor: pointer; color: var(--text-secondary); border-bottom: 2px solid transparent; font-weight: 500; transition: all 0.15s; }
+    .result-tab { padding: 10px 16px; font-size: 12px; font-family: 'Inter', sans-serif; border: none; background: none; cursor: pointer; color: var(--text-secondary); border-bottom: 2px solid transparent; font-weight: 500; transition: all 0.15s; }
     .result-tab.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 700; }
     .result-content { padding: 20px; font-size: 14px; line-height: 2; color: var(--text); white-space: pre-wrap; min-height: 120px; background: var(--card); backdrop-filter: var(--blur); }
     .result-content.error { color: var(--error); background: var(--error-bg); }
-
     .rating-box { padding: 14px 20px; border-top: 1px solid var(--border); background: var(--card); display: flex; align-items: center; gap: 12px; }
     .rating-label { font-size: 12px; color: var(--text-secondary); }
     .stars { display: flex; gap: 4px; }
     .star { font-size: 22px; cursor: pointer; transition: transform 0.15s; filter: grayscale(1); opacity: 0.4; }
     .star:hover, .star.active { filter: grayscale(0); opacity: 1; transform: scale(1.2); }
-    .rating-msg { font-size: 12px; color: var(--primary); font-weight: 500; margin-right: auto; }
-
+    .rating-msg { font-size: 12px; color: var(--primary); font-weight: 500; margin-left: auto; }
     .qa-box { padding: 14px 16px; border-top: 1px solid var(--border); display: flex; gap: 8px; background: var(--card); }
-    .qa-input { flex: 1; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 12px; font-family: 'Vazirmatn', Tahoma; font-size: 13px; background: var(--primary-light); color: var(--text); outline: none; transition: border-color 0.2s; }
+    .qa-input { flex: 1; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 12px; font-family: 'Inter', sans-serif; font-size: 13px; background: var(--primary-light); color: var(--text); outline: none; transition: border-color 0.2s; }
     .qa-input:focus { border-color: var(--primary); }
-    .qa-btn { padding: 10px 18px; background: var(--primary); color: white; border: none; border-radius: 12px; font-family: 'Vazirmatn', Tahoma; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.2s; }
+    .qa-btn { padding: 10px 18px; background: var(--primary); color: white; border: none; border-radius: 12px; font-family: 'Inter', sans-serif; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.2s; }
     .qa-btn:hover { background: var(--primary-dark); transform: translateY(-1px); }
-
     .cloud-box { padding: 14px 16px; border-top: 1px solid var(--border); background: var(--primary-light); }
     .cloud-title { font-size: 12px; color: var(--text-secondary); margin-bottom: 10px; font-weight: 600; }
     .cloud-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
     .cloud-link { font-size: 11px; color: var(--primary); word-break: break-all; flex: 1; background: var(--card); padding: 6px 10px; border-radius: 8px; border: 1px solid var(--border); }
-    .cloud-btn { padding: 7px 12px; border-radius: 10px; border: 1.5px solid; font-size: 12px; font-family: 'Vazirmatn', Tahoma; cursor: pointer; background: var(--card); font-weight: 500; transition: all 0.2s; text-decoration: none; display: inline-block; }
+    .cloud-btn { padding: 7px 12px; border-radius: 10px; border: 1.5px solid; font-size: 12px; font-family: 'Inter', sans-serif; cursor: pointer; background: var(--card); font-weight: 500; transition: all 0.2s; text-decoration: none; display: inline-block; }
     .cloud-btn:hover { transform: translateY(-1px); }
     .cloud-btn-copy { border-color: var(--primary); color: var(--primary); }
     .cloud-btn-delete { border-color: #e74c3c; color: #e74c3c; }
     .cloud-btn-download { border-color: #1a7a3c; color: #1a7a3c; }
     .img-preview { width: 100%; border-radius: 12px; margin-top: 10px; max-height: 220px; object-fit: contain; }
-
     .history-title { font-size: 14px; font-weight: 700; color: var(--primary); margin-bottom: 14px; }
     .history-empty { font-size: 13px; color: var(--text-muted); text-align: center; padding: 24px; }
-    .history-item { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); transition: all 0.2s; cursor: default; }
+    .history-item { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); transition: all 0.2s; }
     .history-item:last-child { border-bottom: none; }
-    .history-item:hover { padding-right: 6px; }
+    .history-item:hover { padding-left: 4px; }
     .history-info { flex: 1; }
     .history-name { font-size: 13px; color: var(--text); font-weight: 600; margin-bottom: 3px; }
     .history-meta { font-size: 11px; color: var(--text-muted); }
     .status-done { font-size: 11px; padding: 3px 10px; border-radius: 20px; background: var(--success-bg); color: var(--success); font-weight: 500; }
     .status-error { font-size: 11px; padding: 3px 10px; border-radius: 20px; background: var(--error-bg); color: var(--error); font-weight: 500; }
-
+    .search-box { display: flex; gap: 8px; margin-bottom: 14px; }
+    .search-input { flex: 1; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 12px; font-family: 'Inter', sans-serif; font-size: 13px; background: var(--primary-light); color: var(--text); outline: none; transition: border-color 0.2s; }
+    .search-input:focus { border-color: var(--primary); }
+    .search-btn { padding: 10px 16px; background: var(--primary); color: white; border: none; border-radius: 12px; cursor: pointer; font-size: 13px; transition: all 0.2s; }
+    .search-btn:hover { background: var(--primary-dark); }
     .toast-container { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; gap: 8px; z-index: 1000; pointer-events: none; align-items: center; }
-    .toast { padding: 12px 24px; border-radius: 14px; font-size: 13px; font-weight: 500; font-family: 'Vazirmatn', Tahoma; animation: toastIn 0.3s ease; box-shadow: 0 8px 24px rgba(0,0,0,0.15); pointer-events: all; backdrop-filter: blur(10px); white-space: nowrap; }
+    .toast { padding: 12px 24px; border-radius: 14px; font-size: 13px; font-weight: 500; font-family: 'Inter', sans-serif; animation: toastIn 0.3s ease; box-shadow: 0 8px 24px rgba(0,0,0,0.15); pointer-events: all; backdrop-filter: blur(10px); white-space: nowrap; }
     .toast-success { background: var(--success-bg); color: var(--success); border: 1px solid rgba(29,158,117,0.3); }
     .toast-error { background: var(--error-bg); color: var(--error); border: 1px solid rgba(226,75,74,0.3); }
     .toast-info { background: var(--card); color: var(--primary); border: 1px solid var(--border); }
@@ -259,26 +174,24 @@
   <div class="header">
     <div class="header-title">
       <h1>☁️ Cloud File Intelligence</h1>
-      <p>فایل آپلود کن، با هوش مصنوعی تحلیل بگیر</p>
+      <p>Upload your file and get AI-powered analysis</p>
     </div>
     <button class="theme-btn" id="themeBtn" onclick="toggleTheme()">🌙</button>
   </div>
 
   <div class="card">
     <div class="stats">
-      <div class="stat"><div class="stat-num" id="totalCount">0</div><div class="stat-label">فایل تحلیل شده</div></div>
-      <div class="stat"><div class="stat-num" id="totalSize">0.0</div><div class="stat-label">مگابایت</div></div>
-      <div class="stat"><div class="stat-num" id="totalSuccess">0</div><div class="stat-label">موفق</div></div>
+      <div class="stat"><div class="stat-num" id="totalCount">0</div><div class="stat-label">Files Analyzed</div></div>
+      <div class="stat"><div class="stat-num" id="totalSize">0.0</div><div class="stat-label">Megabytes</div></div>
+      <div class="stat"><div class="stat-num" id="totalSuccess">0</div><div class="stat-label">Successful</div></div>
     </div>
 
     <div class="dropzone" id="dropzone" onclick="document.getElementById('fileInput').click()">
       <div class="upload-anim">
-        <div class="upload-circle">
-          <span class="upload-icon">📁</span>
-        </div>
+        <div class="upload-circle">📁</div>
       </div>
-      <p>فایل رو اینجا رها کن یا کلیک کن</p>
-      <span>حداکثر ۱۰ مگابایت</span>
+      <p>Drop your file here or click to browse</p>
+      <span>Maximum 10 MB</span>
       <div class="file-types">
         <span class="type-badge type-pdf">PDF</span>
         <span class="type-badge type-img">PNG / JPG</span>
@@ -302,18 +215,18 @@
     <div class="options">
       <div class="option selected" data-mode="summary" onclick="selectMode(this)">
         <div class="option-icon">📝</div>
-        <div class="option-label">خلاصه</div>
-        <div class="option-desc">متن کوتاه</div>
+        <div class="option-label">Summary</div>
+        <div class="option-desc">Short overview</div>
       </div>
       <div class="option" data-mode="keypoints" onclick="selectMode(this)">
         <div class="option-icon">💡</div>
-        <div class="option-label">نکات کلیدی</div>
-        <div class="option-desc">مهم‌ترین ایده‌ها</div>
+        <div class="option-label">Key Points</div>
+        <div class="option-desc">Main ideas</div>
       </div>
       <div class="option" data-mode="qa" onclick="selectMode(this)">
         <div class="option-icon">❓</div>
-        <div class="option-label">پرسش و پاسخ</div>
-        <div class="option-desc">سوال بپرس</div>
+        <div class="option-label">Q&A</div>
+        <div class="option-desc">Ask questions</div>
       </div>
     </div>
 
@@ -322,14 +235,14 @@
     </div>
 
     <button class="btn" id="analyzeBtn" onclick="analyzeFile()" disabled>
-      ✨ تحلیل با هوش مصنوعی
+      ✨ Analyze with AI
     </button>
 
     <div class="result-box" id="resultBox">
       <div class="result-tabs" id="resultTabs"></div>
       <div class="result-content" id="resultContent"></div>
       <div class="rating-box" id="ratingBox" style="display:none">
-        <span class="rating-label">کیفیت تحلیل:</span>
+        <span class="rating-label">Analysis quality:</span>
         <div class="stars" id="stars">
           <span class="star" onclick="rate(1)">⭐</span>
           <span class="star" onclick="rate(2)">⭐</span>
@@ -340,25 +253,29 @@
         <span class="rating-msg" id="ratingMsg"></span>
       </div>
       <div class="qa-box" id="qaBox" style="display:none">
-        <input class="qa-input" id="qaInput" placeholder="سوالت رو بنویس..." onkeydown="if(event.key==='Enter') askQuestion()">
-        <button class="qa-btn" onclick="askQuestion()">بپرس ↗</button>
+        <input class="qa-input" id="qaInput" placeholder="Ask a question about the file..." onkeydown="if(event.key==='Enter') askQuestion()">
+        <button class="qa-btn" onclick="askQuestion()">Ask ↗</button>
       </div>
       <div class="cloud-box" id="cloudBox" style="display:none">
-        <div class="cloud-title">☁️ فایل روی Cloud ذخیره شد</div>
+        <div class="cloud-title">☁️ File saved to Cloud</div>
         <img id="imgPreview" class="img-preview" style="display:none">
         <div class="cloud-actions">
           <span class="cloud-link" id="cloudLink"></span>
-          <button class="cloud-btn cloud-btn-copy" onclick="copyLink()">📋 کپی</button>
-          <a id="downloadBtn" class="cloud-btn cloud-btn-download" target="_blank">⬇️ دانلود</a>
-          <button class="cloud-btn cloud-btn-delete" onclick="deleteFile()">🗑️ حذف</button>
+          <button class="cloud-btn cloud-btn-copy" onclick="copyLink()">📋 Copy</button>
+          <a id="downloadBtn" class="cloud-btn cloud-btn-download" target="_blank">⬇️ Download</a>
+          <button class="cloud-btn cloud-btn-delete" onclick="deleteFile()">🗑️ Delete</button>
         </div>
       </div>
     </div>
   </div>
 
   <div class="card">
-    <div class="history-title">📋 تاریخچه تحلیل‌ها</div>
-    <div id="historyList"><div class="history-empty">هنوز فایلی تحلیل نشده</div></div>
+    <div class="history-title">📋 Analysis History</div>
+    <div class="search-box">
+      <input class="search-input" id="searchInput" placeholder="Search history..." onkeydown="if(event.key==='Enter') searchHistory()">
+      <button class="search-btn" onclick="searchHistory()">🔍</button>
+    </div>
+    <div id="historyList"><div class="history-empty">No files analyzed yet</div></div>
   </div>
 </div>
 
@@ -366,6 +283,7 @@
 
 <script>
   const fileIcons = { pdf:'📕', png:'🖼️', jpg:'🖼️', jpeg:'🖼️', txt:'📝' }
+  const ratingMsgs = ['', 'Poor 😕', 'Fair 🙂', 'Good 👍', 'Great 🌟', 'Excellent 🚀']
   let currentMode = 'summary'
   let currentFile = null
   let results = {}
@@ -375,8 +293,6 @@
   let isDark = false
   let progressInterval = null
   let currentRating = 0
-
-  const ratingMsgs = ['', 'ضعیف بود 😕', 'معمولی بود 🙂', 'خوب بود 👍', 'عالی بود 🌟', 'فوق‌العاده بود 🚀']
 
   document.getElementById('fileInput').addEventListener('change', e => handleFile(e.target.files[0]))
   const dz = document.getElementById('dropzone')
@@ -388,7 +304,7 @@
     isDark = !isDark
     document.body.classList.toggle('dark', isDark)
     document.getElementById('themeBtn').textContent = isDark ? '☀️' : '🌙'
-    showToast(isDark ? 'حالت تاریک فعال شد' : 'حالت روشن فعال شد', 'info')
+    showToast(isDark ? 'Dark mode on' : 'Light mode on', 'info')
   }
 
   function showToast(msg, type = 'info') {
@@ -402,10 +318,9 @@
 
   function rate(n) {
     currentRating = n
-    const stars = document.querySelectorAll('.star')
-    stars.forEach((s, i) => s.classList.toggle('active', i < n))
+    document.querySelectorAll('.star').forEach((s, i) => s.classList.toggle('active', i < n))
     document.getElementById('ratingMsg').textContent = ratingMsgs[n]
-    showToast('امتیاز ثبت شد ' + '⭐'.repeat(n), 'success')
+    showToast('Rating saved ' + '⭐'.repeat(n), 'success')
   }
 
   function selectMode(el) {
@@ -429,7 +344,7 @@
     document.getElementById('resultBox').style.display = 'none'
     results = {}
     currentCloudData = null
-    showToast('فایل انتخاب شد ✓', 'info')
+    showToast('File selected ✓', 'info')
   }
 
   function removeFile() {
@@ -491,13 +406,13 @@
       showCloudBox(data)
       updateStats(true)
       addHistory(currentFile.name, currentFile.size, true)
-      showToast('تحلیل با موفقیت انجام شد ✓', 'success')
+      showToast('Analysis complete ✓', 'success')
     } catch (err) {
       completeProgress()
-      showError('خطا: ' + err.message)
-      addHistory(currentFile ? currentFile.name : 'نامشخص', currentFile ? currentFile.size : 0, false)
+      showError('Error: ' + err.message)
+      addHistory(currentFile ? currentFile.name : 'Unknown', currentFile ? currentFile.size : 0, false)
       updateStats(false)
-      showToast('خطا در تحلیل فایل', 'error')
+      showToast('Analysis failed', 'error')
     }
     setLoading(false)
   }
@@ -520,12 +435,25 @@
       const prev = results['qa'] || ''
       results['qa'] = prev + (prev ? '\n\n───\n\n' : '') + '❓ ' + q + '\n\n' + data.result
       showResult('qa')
-      showToast('پاسخ دریافت شد', 'success')
+      showToast('Answer received', 'success')
     } catch (err) {
-      showError('خطا: ' + err.message)
-      showToast('خطا در دریافت پاسخ', 'error')
+      showError('Error: ' + err.message)
+      showToast('Failed to get answer', 'error')
     }
     setLoading(false)
+  }
+
+  async function searchHistory() {
+    const q = document.getElementById('searchInput').value.trim()
+    if (!q) { loadHistory(); return }
+    try {
+      const res = await fetch(`http://localhost:3000/search?q=${encodeURIComponent(q)}`)
+      const data = await res.json()
+      renderHistoryData(data)
+      showToast(`${data.length} result(s) found`, 'info')
+    } catch (err) {
+      showToast('Search failed', 'error')
+    }
   }
 
   function showSkeleton() {
@@ -555,12 +483,12 @@
   function copyLink() {
     if (!currentCloudData) return
     navigator.clipboard.writeText(currentCloudData.url)
-    showToast('لینک کپی شد 📋', 'success')
+    showToast('Link copied 📋', 'success')
   }
 
   async function deleteFile() {
     if (!currentCloudData) return
-    if (!confirm('فایل از Cloud حذف بشه؟')) return
+    if (!confirm('Delete this file from Cloud?')) return
     try {
       const encodedId = encodeURIComponent(currentCloudData.publicId)
       const res = await fetch(`http://localhost:3000/file/${encodedId}?resourceType=${currentCloudData.resourceType}`, { method: 'DELETE' })
@@ -568,18 +496,17 @@
       if (data.error) throw new Error(data.error)
       document.getElementById('cloudBox').style.display = 'none'
       currentCloudData = null
-      showToast('فایل از Cloud حذف شد 🗑️', 'info')
+      showToast('File deleted from Cloud 🗑️', 'info')
     } catch (err) {
-      showToast('خطا در حذف: ' + err.message, 'error')
+      showToast('Delete failed: ' + err.message, 'error')
     }
   }
 
   function showResult(mode) {
     const box = document.getElementById('resultBox')
     box.style.display = 'block'
-    const content = document.getElementById('resultContent')
-    content.className = 'result-content'
-    content.textContent = results[mode] || ''
+    document.getElementById('resultContent').className = 'result-content'
+    document.getElementById('resultContent').textContent = results[mode] || ''
     document.getElementById('qaBox').style.display = mode === 'qa' ? 'flex' : 'none'
     document.getElementById('ratingBox').style.display = 'flex'
     document.getElementById('progress').style.display = 'none'
@@ -601,7 +528,7 @@
   function setLoading(on) {
     const btn = document.getElementById('analyzeBtn')
     btn.disabled = on
-    btn.textContent = on ? '⏳ در حال تحلیل...' : '✨ تحلیل با هوش مصنوعی'
+    btn.textContent = on ? '⏳ Analyzing...' : '✨ Analyze with AI'
     if (!on) document.getElementById('progress').style.display = 'none'
   }
 
@@ -614,52 +541,39 @@
     document.getElementById('totalSuccess').textContent = stats.success
   }
 
-function addHistory(name, size, success) {
-    history.unshift({ name, size, success, time: new Date().toLocaleTimeString('fa-IR') })
-    renderHistory()
+  function addHistory(name, size, success) {
+    history.unshift({ name, size, success, time: new Date().toLocaleTimeString('en-US') })
+    loadHistory()
   }
 
   async function loadHistory() {
     try {
       const res = await fetch('http://localhost:3000/history')
       const data = await res.json()
-      const list = document.getElementById('historyList')
-      if (!data.length) {
-        list.innerHTML = '<div class="history-empty">هنوز فایلی تحلیل نشده</div>'
-        return
-      }
-      list.innerHTML = data.map(h => `
-        <div class="history-item">
-          <div style="font-size:24px">${fileIcons[h.filename.split('.').pop().toLowerCase()] || '📄'}</div>
-          <div class="history-info">
-            <div class="history-name">${h.filename}</div>
-            <div class="history-meta">${(h.filesize/1024/1024).toFixed(1)} MB · ${h.created_at.slice(11,16)} · ${h.mode}</div>
-          </div>
-          <span class="status-done">✅ موفق</span>
-        </div>
-      `).join('')
+      renderHistoryData(data)
     } catch (err) {
-      console.error('خطا در بارگذاری تاریخچه:', err)
+      console.error('Failed to load history:', err)
     }
   }
 
-  function renderHistory() {
+  function renderHistoryData(data) {
     const list = document.getElementById('historyList')
-    if (!history.length) {
-      list.innerHTML = '<div class="history-empty">هنوز فایلی تحلیل نشده</div>'
+    if (!data.length) {
+      list.innerHTML = '<div class="history-empty">No files analyzed yet</div>'
       return
     }
-    list.innerHTML = history.map(h => `
+    list.innerHTML = data.map(h => `
       <div class="history-item">
-        <div style="font-size:24px">${fileIcons[h.name.split('.').pop().toLowerCase()] || '📄'}</div>
+        <div style="font-size:24px">${fileIcons[h.filename.split('.').pop().toLowerCase()] || '📄'}</div>
         <div class="history-info">
-          <div class="history-name">${h.name}</div>
-          <div class="history-meta">${(h.size/1024/1024).toFixed(1)} MB · ${h.time}</div>
+          <div class="history-name">${h.filename}</div>
+          <div class="history-meta">${(h.filesize/1024/1024).toFixed(1)} MB · ${h.created_at.slice(11,16)} · ${h.mode}</div>
         </div>
-        <span class="${h.success ? 'status-done' : 'status-error'}">${h.success ? '✅ موفق' : '❌ خطا'}</span>
+        <span class="status-done">✅ Done</span>
       </div>
     `).join('')
   }
+
   loadHistory()
 </script>
 </body>
