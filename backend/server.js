@@ -6,6 +6,7 @@ const fs = require('fs')
 const OpenAI = require('openai')
 const { PdfReader } = require('pdfreader')
 const cloudinary = require('cloudinary').v2
+const { saveAnalysis, getAnalyses, deleteAnalysis, searchAnalyses } = require('./database')
 
 const app = express()
 const PORT = process.env.PORT || 3000
@@ -64,11 +65,7 @@ async function uploadToCloudinary(filePath, mimeType) {
     access_mode: 'public',
     flags: 'attachment'
   })
-  return {
-    url: result.secure_url,
-    publicId: result.public_id,
-    resourceType
-  }
+  return { url: result.secure_url, publicId: result.public_id, resourceType }
 }
 
 app.post('/analyze', upload.single('file'), async (req, res) => {
@@ -103,7 +100,7 @@ app.post('/analyze', upload.single('file'), async (req, res) => {
     } else {
       const text = await extractText(req.file.path, mimeType)
       if (!text || text.trim().length < 10) {
-        fs.unlinkSync(req.file.path)
+        if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path)
         return res.status(400).json({ error: 'متنی در فایل پیدا نشد' })
       }
       messages = [{
@@ -118,17 +115,19 @@ app.post('/analyze', upload.single('file'), async (req, res) => {
     })
 
     const result = response.choices[0].message.content
-
     if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path)
 
-    res.json({
-      result,
+    saveAnalysis({
+      filename: req.file.originalname,
+      filesize: req.file.size,
+      filetype: mimeType,
       mode,
+      result,
       cloudUrl: cloudData.url,
-      publicId: cloudData.publicId,
-      resourceType: cloudData.resourceType,
-      isImage
+      publicId: cloudData.publicId
     })
+
+    res.json({ result, mode, cloudUrl: cloudData.url, publicId: cloudData.publicId, resourceType: cloudData.resourceType, isImage })
   } catch (err) {
     if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path)
     console.error(err)
@@ -144,6 +143,25 @@ app.delete('/file/:publicId', async (req, res) => {
     res.json({ message: 'فایل حذف شد' })
   } catch (err) {
     res.status(500).json({ error: 'خطا در حذف: ' + err.message })
+  }
+})
+
+app.get('/history', (req, res) => {
+  try {
+    const analyses = getAnalyses()
+    res.json(analyses)
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
+app.get('/search', (req, res) => {
+  try {
+    const query = req.query.q || ''
+    const results = searchAnalyses(query)
+    res.json(results)
+  } catch (err) {
+    res.status(500).json({ error: err.message })
   }
 })
 

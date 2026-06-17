@@ -614,9 +614,41 @@
     document.getElementById('totalSuccess').textContent = stats.success
   }
 
-  function addHistory(name, size, success) {
+function addHistory(name, size, success) {
     history.unshift({ name, size, success, time: new Date().toLocaleTimeString('fa-IR') })
+    renderHistory()
+  }
+
+  async function loadHistory() {
+    try {
+      const res = await fetch('http://localhost:3000/history')
+      const data = await res.json()
+      const list = document.getElementById('historyList')
+      if (!data.length) {
+        list.innerHTML = '<div class="history-empty">هنوز فایلی تحلیل نشده</div>'
+        return
+      }
+      list.innerHTML = data.map(h => `
+        <div class="history-item">
+          <div style="font-size:24px">${fileIcons[h.filename.split('.').pop().toLowerCase()] || '📄'}</div>
+          <div class="history-info">
+            <div class="history-name">${h.filename}</div>
+            <div class="history-meta">${(h.filesize/1024/1024).toFixed(1)} MB · ${h.created_at.slice(11,16)} · ${h.mode}</div>
+          </div>
+          <span class="status-done">✅ موفق</span>
+        </div>
+      `).join('')
+    } catch (err) {
+      console.error('خطا در بارگذاری تاریخچه:', err)
+    }
+  }
+
+  function renderHistory() {
     const list = document.getElementById('historyList')
+    if (!history.length) {
+      list.innerHTML = '<div class="history-empty">هنوز فایلی تحلیل نشده</div>'
+      return
+    }
     list.innerHTML = history.map(h => `
       <div class="history-item">
         <div style="font-size:24px">${fileIcons[h.name.split('.').pop().toLowerCase()] || '📄'}</div>
@@ -628,6 +660,7 @@
       </div>
     `).join('')
   }
+  loadHistory()
 </script>
 </body>
 </html>

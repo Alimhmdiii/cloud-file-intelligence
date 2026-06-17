@@ -2,9 +2,10 @@
 
 یک سیستم هوشمند آپلود و تحلیل فایل با هوش مصنوعی
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue)
+![Version](https://img.shields.io/badge/version-1.2.0-blue)
 ![Node](https://img.shields.io/badge/node-v24-green)
 ![License](https://img.shields.io/badge/license-MIT-purple)
+![Status](https://img.shields.io/badge/status-active-success)
 
 ---
 
@@ -17,7 +18,11 @@
 - 📝 خلاصه‌سازی خودکار
 - 💡 استخراج نکات کلیدی
 - ❓ پرسش و پاسخ از محتوای فایل
-- 📋 تاریخچه تحلیل‌ها
+- ☁️ ذخیره فایل روی Cloud با لینک دائمی
+- 📋 تاریخچه دائمی تحلیل‌ها
+- 🌙 Dark mode
+- ⭐ امتیازدهی به نتایج
+- 🔔 Toast notifications
 
 ---
 
@@ -29,7 +34,10 @@
 | آپلود فایل | Multer |
 | خواندن PDF | pdfreader |
 | هوش مصنوعی | OpenRouter API |
+| Cloud Storage | Cloudinary |
+| دیتابیس | SQLite + better-sqlite3 |
 | Frontend | HTML + CSS + JavaScript |
+| فونت | Vazirmatn |
 | Version Control | Git + GitHub |
 
 ---
@@ -39,6 +47,7 @@
 ### پیش‌نیازها
 - Node.js v18 یا بالاتر
 - اکانت OpenRouter
+- اکانت Cloudinary
 
 ### مراحل نصب
 
@@ -55,14 +64,17 @@ npm install
 ```
 
 **۳. ساخت فایل `.env`:**
-```bash
-OPENROUTER_API_KEY=کلید_خودت
+```env
+OPENROUTER_API_KEY=کلید_openrouter
+CLOUDINARY_CLOUD_NAME=نام_cloud
+CLOUDINARY_API_KEY=کلید_cloudinary
+CLOUDINARY_API_SECRET=سکرت_cloudinary
 PORT=3000
 ```
 
 **۴. اجرای سرور:**
 ```bash
-node server.js
+npm run dev
 ```
 
 **۵. باز کردن پروژه:**
@@ -78,9 +90,13 @@ cloud-file-intelligence/
 
 │   ├── server.js          # سرور اصلی
 
+│   ├── database.js        # مدیریت دیتابیس
+
+│   ├── intelligence.db    # فایل دیتابیس SQLite
+
 │   ├── package.json       # پکیج‌ها
 
-│   └── uploads/           # فایل‌های آپلود شده
+│   └── uploads/           # فایل‌های موقت
 
 ├── frontend/
 
@@ -89,16 +105,18 @@ cloud-file-intelligence/
 ├── .gitignore
 
 └── README.md
+
 ---
 
 ## 🗺️ نقشه راه
 
 - [x] فاز ۱ — UI و آپلود فایل
-- [x] فاز ۲ — اتصال به هوش مصنوعی  
+- [x] فاز ۲ — اتصال به هوش مصنوعی
 - [x] فاز ۳ — Backend با Node.js
-- [ ] فاز ۴ — Cloud Storage با Cloudinary
-- [ ] فاز ۵ — دیتابیس با PostgreSQL
-- [ ] فاز ۶ — احراز هویت و Deploy
+- [x] فاز ۴ — Cloud Storage با Cloudinary
+- [x] فاز ۵ — دیتابیس با SQLite
+- [ ] فاز ۶ — احراز هویت کاربر
+- [ ] فاز ۷ — Deploy روی اینترنت
 
 ---
 
