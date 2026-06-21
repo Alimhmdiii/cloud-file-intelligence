@@ -69,7 +69,7 @@
       pointer-events: none; z-index: 0;
     }
     .container { max-width: 640px; margin: 0 auto; position: relative; z-index: 1; }
-    .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; }
+    .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; flex-wrap: wrap; gap: 12px; }
     .header-title h1 { font-size: 22px; font-weight: 700; color: var(--primary); margin-bottom: 2px; }
     .header-title p { font-size: 13px; color: var(--text-secondary); }
     .theme-btn { width: 42px; height: 42px; border-radius: 50%; border: 1px solid var(--card-border); background: var(--card); backdrop-filter: var(--blur); cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow); transition: transform 0.2s; }
@@ -176,7 +176,11 @@
       <h1>☁️ Cloud File Intelligence</h1>
       <p>Upload your file and get AI-powered analysis</p>
     </div>
-    <button class="theme-btn" id="themeBtn" onclick="toggleTheme()">🌙</button>
+    <div style="display:flex;gap:10px;align-items:center">
+      <span id="userName" style="font-size:13px;color:var(--text-secondary);font-weight:500"></span>
+      <button class="theme-btn" id="themeBtn" onclick="toggleTheme()">🌙</button>
+      <button class="theme-btn" onclick="logout()" title="Logout" style="font-size:16px">🚪</button>
+    </div>
   </div>
 
   <div class="card">
@@ -282,6 +286,20 @@
 <div class="toast-container" id="toastContainer"></div>
 
 <script>
+  const token = localStorage.getItem('token')
+  const user = JSON.parse(localStorage.getItem('user') || '{}')
+
+  if (!token) {
+    window.location.href = 'auth.html'
+  }
+
+  document.getElementById('userName').textContent = user.name || ''
+
+  function logout() {
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
+    window.location.href = 'auth.html'
+  }
   const fileIcons = { pdf:'📕', png:'🖼️', jpg:'🖼️', jpeg:'🖼️', txt:'📝' }
   const ratingMsgs = ['', 'Poor 😕', 'Fair 🙂', 'Good 👍', 'Great 🌟', 'Excellent 🚀']
   let currentMode = 'summary'
@@ -394,7 +412,11 @@
     formData.append('mode', currentMode)
 
     try {
-      const res = await fetch('http://localhost:3000/analyze', { method: 'POST', body: formData })
+      const res = await fetch('http://localhost:3000/analyze', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + token },
+        body: formData
+      })
       const data = await res.json()
       if (data.error) throw new Error(data.error)
 
@@ -429,7 +451,11 @@
     formData.append('question', q)
 
     try {
-      const res = await fetch('http://localhost:3000/analyze', { method: 'POST', body: formData })
+      const res = await fetch('http://localhost:3000/analyze', {
+  method: 'POST',
+  headers: { 'Authorization': 'Bearer ' + token },
+  body: formData
+})
       const data = await res.json()
       if (data.error) throw new Error(data.error)
       const prev = results['qa'] || ''
@@ -442,12 +468,13 @@
     }
     setLoading(false)
   }
-
   async function searchHistory() {
     const q = document.getElementById('searchInput').value.trim()
     if (!q) { loadHistory(); return }
     try {
-      const res = await fetch(`http://localhost:3000/search?q=${encodeURIComponent(q)}`)
+      const res = await fetch(`http://localhost:3000/search?q=${encodeURIComponent(q)}`, {
+  headers: { 'Authorization': 'Bearer ' + token }
+})
       const data = await res.json()
       renderHistoryData(data)
       showToast(`${data.length} result(s) found`, 'info')
@@ -491,7 +518,10 @@
     if (!confirm('Delete this file from Cloud?')) return
     try {
       const encodedId = encodeURIComponent(currentCloudData.publicId)
-      const res = await fetch(`http://localhost:3000/file/${encodedId}?resourceType=${currentCloudData.resourceType}`, { method: 'DELETE' })
+      const res = await fetch(`http://localhost:3000/file/${encodedId}?resourceType=${currentCloudData.resourceType}`, {
+  method: 'DELETE',
+  headers: { 'Authorization': 'Bearer ' + token }
+})
       const data = await res.json()
       if (data.error) throw new Error(data.error)
       document.getElementById('cloudBox').style.display = 'none'
@@ -548,7 +578,9 @@
 
   async function loadHistory() {
     try {
-      const res = await fetch('http://localhost:3000/history')
+      const res = await fetch('http://localhost:3000/history', {
+  headers: { 'Authorization': 'Bearer ' + token }
+})
       const data = await res.json()
       renderHistoryData(data)
     } catch (err) {

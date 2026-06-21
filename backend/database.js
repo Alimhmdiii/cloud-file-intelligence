@@ -4,8 +4,19 @@ const path = require('path')
 const db = new Database(path.join(__dirname, 'intelligence.db'))
 
 db.exec(`
+  CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    email TEXT UNIQUE NOT NULL,
+    password TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  )
+`)
+
+db.exec(`
   CREATE TABLE IF NOT EXISTS analyses (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,
     filename TEXT NOT NULL,
     filesize REAL NOT NULL,
     filetype TEXT NOT NULL,
@@ -13,19 +24,36 @@ db.exec(`
     result TEXT NOT NULL,
     cloud_url TEXT,
     public_id TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
   )
 `)
 
-function saveAnalysis(data) {
-  const stmt = db.prepare(`
-    INSERT INTO analyses (filename, filesize, filetype, mode, result, cloud_url, public_id)
-    VALUES (?, ?, ?, ?, ?, ?, ?)
-  `)
-  return stmt.run(data.filename, data.filesize, data.filetype, data.mode, data.result, data.cloudUrl, data.publicId)
+function createUser(name, email, hashedPassword) {
+  const stmt = db.prepare('INSERT INTO users (name, email, password) VALUES (?, ?, ?)')
+  return stmt.run(name, email, hashedPassword)
 }
 
-function getAnalyses(limit = 20) {
+function getUserByEmail(email) {
+  return db.prepare('SELECT * FROM users WHERE email = ?').get(email)
+}
+
+function getUserById(id) {
+  return db.prepare('SELECT id, name, email, created_at FROM users WHERE id = ?').get(id)
+}
+
+function saveAnalysis(data) {
+  const stmt = db.prepare(`
+    INSERT INTO analyses (user_id, filename, filesize, filetype, mode, result, cloud_url, public_id)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+  `)
+  return stmt.run(data.userId || null, data.filename, data.filesize, data.filetype, data.mode, data.result, data.cloudUrl, data.publicId)
+}
+
+function getAnalyses(userId = null, limit = 20) {
+  if (userId) {
+    return db.prepare('SELECT * FROM analyses WHERE user_id = ? ORDER BY created_at DESC LIMIT ?').all(userId, limit)
+  }
   return db.prepare('SELECT * FROM analyses ORDER BY created_at DESC LIMIT ?').all(limit)
 }
 
@@ -33,7 +61,14 @@ function deleteAnalysis(id) {
   return db.prepare('DELETE FROM analyses WHERE id = ?').run(id)
 }
 
-function searchAnalyses(query) {
+function searchAnalyses(query, userId = null) {
+  if (userId) {
+    return db.prepare(`
+      SELECT * FROM analyses 
+      WHERE user_id = ? AND (filename LIKE ? OR result LIKE ?)
+      ORDER BY created_at DESC LIMIT 20
+    `).all(userId, `%${query}%`, `%${query}%`)
+  }
   return db.prepare(`
     SELECT * FROM analyses 
     WHERE filename LIKE ? OR result LIKE ? 
@@ -41,4 +76,4 @@ function searchAnalyses(query) {
   `).all(`%${query}%`, `%${query}%`)
 }
 
-module.exports = { saveAnalysis, getAnalyses, deleteAnalysis, searchAnalyses }
+module.exports = { createUser, getUserByEmail, getUserById, saveAnalysis, getAnalyses, deleteAnalysis, searchAnalyses }
