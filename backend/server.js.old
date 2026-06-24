@@ -2,6 +2,7 @@ require('dotenv').config()
 const express = require('express')
 const multer = require('multer')
 const cors = require('cors')
+const rateLimit = require('express-rate-limit')
 const fs = require('fs')
 const OpenAI = require('openai')
 const { PdfReader } = require('pdfreader')
@@ -27,6 +28,18 @@ const client = new OpenAI({
 
 app.use(cors())
 app.use(express.json())
+
+const analyzeLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  message: { error: 'Too many requests. Please try again in 15 minutes.' }
+})
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  message: { error: 'Too many login attempts. Please try again in 15 minutes.' }
+})
 
 const uploadDir = './uploads'
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir)
@@ -57,7 +70,7 @@ app.get('/', (req, res) => {
   res.json({ message: 'Server is ready!' })
 })
 
-app.post('/auth/register', async (req, res) => {
+app.post('/auth/register', authLimiter, async (req, res) => {
   const { name, email, password } = req.body
   if (!name || !email || !password) return res.status(400).json({ error: 'All fields are required' })
   if (password.length < 6) return res.status(400).json({ error: 'Password must be at least 6 characters' })
@@ -73,7 +86,7 @@ app.post('/auth/register', async (req, res) => {
   }
 })
 
-app.post('/auth/login', async (req, res) => {
+app.post('/auth/login', authLimiter, async (req, res) => {
   const { email, password } = req.body
   if (!email || !password) return res.status(400).json({ error: 'Email and password required' })
   try {
@@ -120,7 +133,7 @@ async function uploadToCloudinary(filePath, mimeType) {
   return { url: result.secure_url, publicId: result.public_id, resourceType }
 }
 
-app.post('/analyze', authMiddleware, upload.single('file'), async (req, res) => {
+app.post('/analyze', analyzeLimiter, authMiddleware, upload.single('file'), async (req, res) => {
   if (!req.file) return res.status(400).json({ error: 'No file uploaded' })
 
   const mode = req.body.mode || 'summary'
@@ -152,11 +165,10 @@ app.post('/analyze', authMiddleware, upload.single('file'), async (req, res) => 
       messages = [{ role: 'user', content: `${prompts[mode]}\n\nFile content:\n${text}` }]
     }
 
-const response = await client.chat.completions.create({
-  model: 'nex-agi/nex-n2-pro:free',
-  messages
-})
-console.log('AI Response:', JSON.stringify(response))
+    const response = await client.chat.completions.create({
+      model: 'openrouter/free',
+      messages
+    })
 
     const result = response.choices[0].message.content
     if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path)
@@ -180,6 +192,75 @@ console.log('AI Response:', JSON.stringify(response))
     console.error(err)
     res.status(500).json({ error: 'Analysis failed: ' + err.message })
   }
+})
+
+app.post('/analyze-multiple', analyzeLimiter, authMiddleware, upload.array('files', 5), async (req, res) => {
+  if (!req.files || req.files.length === 0) return res.status(400).json({ error: 'No files uploaded' })
+
+  const mode = req.body.mode || 'summary'
+  const prompts = {
+    summary: 'Write a short and clear summary of this content. Maximum 150 words. IMPORTANT: detect the language of the content and respond in that same language.',
+    keypoints: 'List the most important key points from this content. Each point starts with -. IMPORTANT: detect the language of the content and respond in that same language.'
+  }
+
+  const results = []
+
+  for (const file of req.files) {
+    try {
+      const mimeType = file.mimetype
+      const isImage = mimeType.startsWith('image/')
+      const cloudData = await uploadToCloudinary(file.path, mimeType)
+
+      let messages
+      if (isImage) {
+        const base64 = fs.readFileSync(file.path).toString('base64')
+        messages = [{ role: 'user', content: [{ type: 'image_url', image_url: { url: `data:${mimeType};base64,${base64}` } }, { type: 'text', text: prompts[mode] }] }]
+      } else {
+        const text = await extractText(file.path, mimeType)
+        if (!text || text.trim().length < 10) {
+          if (fs.existsSync(file.path)) fs.unlinkSync(file.path)
+          results.push({ filename: file.originalname, error: 'No text found in file' })
+          continue
+        }
+        messages = [{ role: 'user', content: `${prompts[mode]}\n\nFile content:\n${text}` }]
+      }
+
+      const response = await client.chat.completions.create({
+        model: 'nex-agi/nex-n2-pro:free',
+        messages
+      })
+
+      const result = response.choices[0].message.content
+      if (fs.existsSync(file.path)) fs.unlinkSync(file.path)
+
+      const fixedFilename = Buffer.from(file.originalname, 'latin1').toString('utf8')
+
+      saveAnalysis({
+        userId: req.user.id,
+        filename: fixedFilename,
+        filesize: file.size,
+        filetype: mimeType,
+        mode,
+        result,
+        cloudUrl: cloudData.url,
+        publicId: cloudData.publicId
+      })
+
+      results.push({
+        filename: fixedFilename,
+        result,
+        cloudUrl: cloudData.url,
+        publicId: cloudData.publicId,
+        resourceType: cloudData.resourceType,
+        isImage
+      })
+    } catch (err) {
+      if (fs.existsSync(file.path)) fs.unlinkSync(file.path)
+      results.push({ filename: file.originalname, error: err.message })
+    }
+  }
+
+  res.json({ results })
 })
 
 app.delete('/file/:publicId', authMiddleware, async (req, res) => {

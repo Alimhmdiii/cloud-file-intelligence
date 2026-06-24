@@ -72,7 +72,9 @@
     .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; flex-wrap: wrap; gap: 12px; }
     .header-title h1 { font-size: 22px; font-weight: 700; color: var(--primary); margin-bottom: 2px; }
     .header-title p { font-size: 13px; color: var(--text-secondary); }
-    .theme-btn { width: 42px; height: 42px; border-radius: 50%; border: 1px solid var(--card-border); background: var(--card); backdrop-filter: var(--blur); cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow); transition: transform 0.2s; }
+    .header-actions { display: flex; gap: 10px; align-items: center; }
+    .user-name { font-size: 13px; color: var(--text-secondary); font-weight: 500; }
+    .theme-btn { width: 42px; height: 42px; border-radius: 50%; border: 1px solid var(--card-border); background: var(--card); backdrop-filter: var(--blur); cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow); transition: transform 0.2s; }
     .theme-btn:hover { transform: rotate(20deg) scale(1.1); }
     .card { background: var(--card); backdrop-filter: var(--blur); border-radius: 24px; padding: 24px; margin-bottom: 16px; box-shadow: var(--shadow); border: 1px solid var(--card-border); transition: background 0.4s; }
     .stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px; }
@@ -98,7 +100,7 @@
     .file-icon { font-size: 32px; }
     .file-info { flex: 1; }
     .file-name { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
-    .file-meta { font-size: 11px; color: var(--text-muted); display: flex; gap: 6px; }
+    .file-meta { font-size: 11px; color: var(--text-muted); display: flex; gap: 6px; flex-wrap: wrap; }
     .file-meta span { background: var(--card); padding: 2px 8px; border-radius: 6px; border: 1px solid var(--border); }
     .remove-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 18px; padding: 6px; border-radius: 8px; transition: all 0.2s; }
     .remove-btn:hover { color: #e74c3c; background: var(--error-bg); }
@@ -106,6 +108,7 @@
     .option { border: 1.5px solid var(--border); border-radius: 16px; padding: 14px 8px; text-align: center; cursor: pointer; transition: all 0.25s; background: var(--card); }
     .option:hover { background: var(--primary-light); border-color: var(--primary); transform: translateY(-3px); box-shadow: 0 6px 16px rgba(83,74,183,0.15); }
     .option.selected { border-color: var(--primary); background: var(--primary-light); box-shadow: 0 6px 16px rgba(83,74,183,0.2); transform: translateY(-2px); }
+    .option.disabled { opacity: 0.4; cursor: not-allowed; }
     .option-icon { font-size: 24px; margin-bottom: 6px; }
     .option-label { font-size: 12px; color: var(--text); font-weight: 600; }
     .option-desc { font-size: 10px; color: var(--text-muted); margin-top: 3px; }
@@ -167,19 +170,34 @@
     .toast-error { background: var(--error-bg); color: var(--error); border: 1px solid rgba(226,75,74,0.3); }
     .toast-info { background: var(--card); color: var(--primary); border: 1px solid var(--border); }
     @keyframes toastIn { from { opacity: 0; transform: translateY(16px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    .multi-list { display: flex; flex-direction: column; gap: 6px; width: 100%; }
+    .multi-list-header { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+    .multi-file-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .accordion { display: flex; flex-direction: column; gap: 10px; }
+    .accordion-item { border: 1px solid var(--card-border); border-radius: 16px; overflow: hidden; background: var(--card); backdrop-filter: var(--blur); }
+    .accordion-header { display: flex; align-items: center; gap: 10px; padding: 14px 16px; cursor: pointer; user-select: none; }
+    .accordion-header:hover { background: var(--primary-light); }
+    .accordion-icon { font-size: 22px; }
+    .accordion-title { flex: 1; font-size: 13px; font-weight: 600; color: var(--text); }
+    .accordion-status { font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 500; }
+    .accordion-chevron { font-size: 14px; color: var(--text-muted); transition: transform 0.2s; }
+    .accordion-chevron.open { transform: rotate(180deg); }
+    .accordion-body { display: none; padding: 16px; border-top: 1px solid var(--border); font-size: 13px; line-height: 1.9; color: var(--text); white-space: pre-wrap; background: var(--card); }
+    .accordion-body.open { display: block; }
+    .accordion-body.error { color: var(--error); background: var(--error-bg); }
   </style>
 </head>
 <body>
 <div class="container">
   <div class="header">
     <div class="header-title">
-      <h1>☁️ Cloud File Intelligence</h1>
+      <h1>Cloud File Intelligence</h1>
       <p>Upload your file and get AI-powered analysis</p>
     </div>
-    <div style="display:flex;gap:10px;align-items:center">
-      <span id="userName" style="font-size:13px;color:var(--text-secondary);font-weight:500"></span>
-      <button class="theme-btn" id="themeBtn" onclick="toggleTheme()">🌙</button>
-      <button class="theme-btn" onclick="logout()" title="Logout" style="font-size:16px">🚪</button>
+    <div class="header-actions">
+      <span class="user-name" id="userName"></span>
+      <button class="theme-btn" id="themeBtn" onclick="toggleTheme()">Dark</button>
+      <button class="theme-btn" onclick="logout()" title="Logout">Exit</button>
     </div>
   </div>
 
@@ -192,20 +210,20 @@
 
     <div class="dropzone" id="dropzone" onclick="document.getElementById('fileInput').click()">
       <div class="upload-anim">
-        <div class="upload-circle">📁</div>
+        <div class="upload-circle">+</div>
       </div>
-      <p>Drop your file here or click to browse</p>
-      <span>Maximum 10 MB</span>
+      <p>Drop your file(s) here or click to browse</p>
+      <span>Up to 5 files, 10 MB each</span>
       <div class="file-types">
         <span class="type-badge type-pdf">PDF</span>
         <span class="type-badge type-img">PNG / JPG</span>
         <span class="type-badge type-txt">TXT</span>
       </div>
-      <input type="file" id="fileInput" style="display:none" accept=".pdf,.png,.jpg,.jpeg,.txt">
+      <input type="file" id="fileInput" style="display:none" accept=".pdf,.png,.jpg,.jpeg,.txt" multiple>
     </div>
 
     <div class="file-preview" id="filePreview">
-      <div class="file-icon" id="fileIcon">📄</div>
+      <div class="file-icon" id="fileIcon">File</div>
       <div class="file-info">
         <div class="file-name" id="fileName"></div>
         <div class="file-meta">
@@ -213,22 +231,19 @@
           <span id="fileExt"></span>
         </div>
       </div>
-      <button class="remove-btn" onclick="removeFile()">✕</button>
+      <button class="remove-btn" onclick="removeFile()">x</button>
     </div>
 
     <div class="options">
       <div class="option selected" data-mode="summary" onclick="selectMode(this)">
-        <div class="option-icon">📝</div>
         <div class="option-label">Summary</div>
         <div class="option-desc">Short overview</div>
       </div>
       <div class="option" data-mode="keypoints" onclick="selectMode(this)">
-        <div class="option-icon">💡</div>
         <div class="option-label">Key Points</div>
         <div class="option-desc">Main ideas</div>
       </div>
       <div class="option" data-mode="qa" onclick="selectMode(this)">
-        <div class="option-icon">❓</div>
         <div class="option-label">Q&A</div>
         <div class="option-desc">Ask questions</div>
       </div>
@@ -239,7 +254,7 @@
     </div>
 
     <button class="btn" id="analyzeBtn" onclick="analyzeFile()" disabled>
-      ✨ Analyze with AI
+      Analyze with AI
     </button>
 
     <div class="result-box" id="resultBox">
@@ -248,36 +263,40 @@
       <div class="rating-box" id="ratingBox" style="display:none">
         <span class="rating-label">Analysis quality:</span>
         <div class="stars" id="stars">
-          <span class="star" onclick="rate(1)">⭐</span>
-          <span class="star" onclick="rate(2)">⭐</span>
-          <span class="star" onclick="rate(3)">⭐</span>
-          <span class="star" onclick="rate(4)">⭐</span>
-          <span class="star" onclick="rate(5)">⭐</span>
+          <span class="star" onclick="rate(1)">*</span>
+          <span class="star" onclick="rate(2)">*</span>
+          <span class="star" onclick="rate(3)">*</span>
+          <span class="star" onclick="rate(4)">*</span>
+          <span class="star" onclick="rate(5)">*</span>
         </div>
         <span class="rating-msg" id="ratingMsg"></span>
       </div>
       <div class="qa-box" id="qaBox" style="display:none">
         <input class="qa-input" id="qaInput" placeholder="Ask a question about the file..." onkeydown="if(event.key==='Enter') askQuestion()">
-        <button class="qa-btn" onclick="askQuestion()">Ask ↗</button>
+        <button class="qa-btn" onclick="askQuestion()">Ask</button>
       </div>
       <div class="cloud-box" id="cloudBox" style="display:none">
-        <div class="cloud-title">☁️ File saved to Cloud</div>
+        <div class="cloud-title">File saved to Cloud</div>
         <img id="imgPreview" class="img-preview" style="display:none">
         <div class="cloud-actions">
           <span class="cloud-link" id="cloudLink"></span>
-          <button class="cloud-btn cloud-btn-copy" onclick="copyLink()">📋 Copy</button>
-          <a id="downloadBtn" class="cloud-btn cloud-btn-download" target="_blank">⬇️ Download</a>
-          <button class="cloud-btn cloud-btn-delete" onclick="deleteFile()">🗑️ Delete</button>
+          <button class="cloud-btn cloud-btn-copy" onclick="copyLink()">Copy</button>
+          <a id="downloadBtn" class="cloud-btn cloud-btn-download" target="_blank">Download</a>
+          <button class="cloud-btn cloud-btn-delete" onclick="deleteFile()">Delete</button>
         </div>
       </div>
+    </div>
+
+    <div id="multiResultBox" style="display:none;margin-top:16px">
+      <div class="accordion" id="accordionList"></div>
     </div>
   </div>
 
   <div class="card">
-    <div class="history-title">📋 Analysis History</div>
+    <div class="history-title">Analysis History</div>
     <div class="search-box">
       <input class="search-input" id="searchInput" placeholder="Search history..." onkeydown="if(event.key==='Enter') searchHistory()">
-      <button class="search-btn" onclick="searchHistory()">🔍</button>
+      <button class="search-btn" onclick="searchHistory()">Search</button>
     </div>
     <div id="historyList"><div class="history-empty">No files analyzed yet</div></div>
   </div>
@@ -300,78 +319,149 @@
     localStorage.removeItem('user')
     window.location.href = 'auth.html'
   }
-  const fileIcons = { pdf:'📕', png:'🖼️', jpg:'🖼️', jpeg:'🖼️', txt:'📝' }
-  const ratingMsgs = ['', 'Poor 😕', 'Fair 🙂', 'Good 👍', 'Great 🌟', 'Excellent 🚀']
+
+  const fileIcons = { pdf:'PDF', png:'IMG', jpg:'IMG', jpeg:'IMG', txt:'TXT' }
+  const ratingMsgs = ['', 'Poor', 'Fair', 'Good', 'Great', 'Excellent']
   let currentMode = 'summary'
   let currentFile = null
+  let currentFiles = []
+  let multiResults = []
   let results = {}
   let stats = { count: 0, size: 0, success: 0 }
-  let history = []
   let currentCloudData = null
   let isDark = false
   let progressInterval = null
   let currentRating = 0
 
-  document.getElementById('fileInput').addEventListener('change', e => handleFile(e.target.files[0]))
+  document.getElementById('fileInput').addEventListener('change', e => handleFiles(Array.from(e.target.files)))
   const dz = document.getElementById('dropzone')
   dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag') })
   dz.addEventListener('dragleave', () => dz.classList.remove('drag'))
-  dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('drag'); handleFile(e.dataTransfer.files[0]) })
+  dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('drag'); handleFiles(Array.from(e.dataTransfer.files)) })
 
   function toggleTheme() {
     isDark = !isDark
     document.body.classList.toggle('dark', isDark)
-    document.getElementById('themeBtn').textContent = isDark ? '☀️' : '🌙'
+    document.getElementById('themeBtn').textContent = isDark ? 'Light' : 'Dark'
     showToast(isDark ? 'Dark mode on' : 'Light mode on', 'info')
   }
 
-  function showToast(msg, type = 'info') {
+  function showToast(msg, type) {
+    type = type || 'info'
     const container = document.getElementById('toastContainer')
     const toast = document.createElement('div')
-    toast.className = `toast toast-${type}`
+    toast.className = 'toast toast-' + type
     toast.textContent = msg
     container.appendChild(toast)
-    setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = 'opacity 0.3s'; setTimeout(() => toast.remove(), 300) }, 2800)
+    setTimeout(function () {
+      toast.style.opacity = '0'
+      toast.style.transition = 'opacity 0.3s'
+      setTimeout(function () { toast.remove() }, 300)
+    }, 2800)
   }
 
   function rate(n) {
     currentRating = n
-    document.querySelectorAll('.star').forEach((s, i) => s.classList.toggle('active', i < n))
+    document.querySelectorAll('.star').forEach(function (s, i) { s.classList.toggle('active', i < n) })
     document.getElementById('ratingMsg').textContent = ratingMsgs[n]
-    showToast('Rating saved ' + '⭐'.repeat(n), 'success')
+    showToast('Rating saved (' + n + ' stars)', 'success')
+  }
+
+  function setModesEnabled(qaAllowed) {
+    document.querySelectorAll('.option').forEach(function (el) {
+      if (el.dataset.mode === 'qa') {
+        el.classList.toggle('disabled', !qaAllowed)
+      }
+    })
   }
 
   function selectMode(el) {
-    document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'))
+    if (el.classList.contains('disabled')) return
+    document.querySelectorAll('.option').forEach(function (o) { o.classList.remove('selected') })
     el.classList.add('selected')
     currentMode = el.dataset.mode
+    if (currentFiles.length > 1) {
+      document.getElementById('qaBox').style.display = 'none'
+      return
+    }
     if (results[currentMode]) showResult(currentMode)
     document.getElementById('qaBox').style.display = currentMode === 'qa' ? 'flex' : 'none'
+  }
+
+  function handleFiles(files) {
+    if (!files || files.length === 0) return
+    if (files.length === 1) {
+      currentFiles = []
+      handleFile(files[0])
+      return
+    }
+    currentFile = null
+    currentFiles = files.slice(0, 5)
+    setModesEnabled(false)
+    if (currentMode === 'qa') {
+      currentMode = 'summary'
+      document.querySelectorAll('.option').forEach(function (o) { o.classList.toggle('selected', o.dataset.mode === 'summary') })
+    }
+    document.getElementById('qaBox').style.display = 'none'
+    document.getElementById('analyzeBtn').disabled = false
+    document.getElementById('resultBox').style.display = 'none'
+    document.getElementById('multiResultBox').style.display = 'none'
+    results = {}
+    multiResults = []
+    showMultiFilePreview()
+    showToast(currentFiles.length + ' files selected', 'info')
+  }
+
+  function showMultiFilePreview() {
+    const preview = document.getElementById('filePreview')
+    preview.classList.add('show')
+    let chips = ''
+    for (let i = 0; i < currentFiles.length; i++) {
+      chips += '<span class="type-badge type-pdf">' + currentFiles[i].name + '</span>'
+    }
+    preview.innerHTML =
+      '<div class="multi-list">' +
+        '<div class="multi-list-header">' +
+          '<div class="file-name">' + currentFiles.length + ' files selected</div>' +
+          '<button class="remove-btn" onclick="removeFile()">x</button>' +
+        '</div>' +
+        '<div class="multi-file-chips">' + chips + '</div>' +
+      '</div>'
   }
 
   function handleFile(file) {
     if (!file) return
     currentFile = file
+    setModesEnabled(true)
     const ext = file.name.split('.').pop().toLowerCase()
-    document.getElementById('fileIcon').textContent = fileIcons[ext] || '📄'
-    document.getElementById('fileName').textContent = file.name
-    document.getElementById('fileSize').textContent = (file.size / 1024 / 1024).toFixed(1) + ' MB'
-    document.getElementById('fileExt').textContent = ext.toUpperCase()
+    document.getElementById('filePreview').innerHTML =
+      '<div class="file-icon" id="fileIcon">' + (fileIcons[ext] || 'FILE') + '</div>' +
+      '<div class="file-info">' +
+        '<div class="file-name" id="fileName">' + file.name + '</div>' +
+        '<div class="file-meta"><span id="fileSize">' + (file.size / 1024 / 1024).toFixed(1) + ' MB</span><span id="fileExt">' + ext.toUpperCase() + '</span></div>' +
+      '</div>' +
+      '<button class="remove-btn" onclick="removeFile()">x</button>'
     document.getElementById('filePreview').classList.add('show')
     document.getElementById('analyzeBtn').disabled = false
     document.getElementById('resultBox').style.display = 'none'
+    document.getElementById('multiResultBox').style.display = 'none'
     results = {}
     currentCloudData = null
-    showToast('File selected ✓', 'info')
+    showToast('File selected', 'info')
   }
 
   function removeFile() {
     currentFile = null
+    currentFiles = []
     document.getElementById('fileInput').value = ''
     document.getElementById('filePreview').classList.remove('show')
+    document.getElementById('filePreview').innerHTML = ''
     document.getElementById('analyzeBtn').disabled = true
     document.getElementById('resultBox').style.display = 'none'
+    document.getElementById('multiResultBox').style.display = 'none'
+    setModesEnabled(true)
     results = {}
+    multiResults = []
     currentCloudData = null
   }
 
@@ -382,7 +472,7 @@
     bar.style.width = '0%'
     let current = 0
     clearInterval(progressInterval)
-    progressInterval = setInterval(() => {
+    progressInterval = setInterval(function () {
       const remaining = 90 - current
       const step = remaining * 0.035
       current += step
@@ -395,13 +485,17 @@
     clearInterval(progressInterval)
     const bar = document.getElementById('progressBar')
     bar.style.width = '100%'
-    setTimeout(() => {
+    setTimeout(function () {
       document.getElementById('progress').style.display = 'none'
       bar.style.width = '0%'
     }, 400)
   }
 
   async function analyzeFile() {
+    if (currentFiles.length > 1) {
+      await analyzeMultipleFiles()
+      return
+    }
     if (!currentFile) return
     setLoading(true)
     showSkeleton()
@@ -426,17 +520,104 @@
       completeProgress()
       showResult(currentMode)
       showCloudBox(data)
-      updateStats(true)
-      addHistory(currentFile.name, currentFile.size, true)
-      showToast('Analysis complete ✓', 'success')
+      updateStats(true, currentFile.size)
+      loadHistory()
+      showToast('Analysis complete', 'success')
     } catch (err) {
       completeProgress()
-      showError('Error: ' + err.message)
-      addHistory(currentFile ? currentFile.name : 'Unknown', currentFile ? currentFile.size : 0, false)
-      updateStats(false)
+      showError(err.message)
+      updateStats(false, currentFile ? currentFile.size : 0)
       showToast('Analysis failed', 'error')
     }
     setLoading(false)
+  }
+
+  async function analyzeMultipleFiles() {
+    if (!currentFiles.length) return
+    setLoading(true)
+    animateProgress()
+    document.getElementById('resultBox').style.display = 'none'
+    document.getElementById('multiResultBox').style.display = 'block'
+    renderAccordionLoading()
+
+    const formData = new FormData()
+    for (let i = 0; i < currentFiles.length; i++) {
+      formData.append('files', currentFiles[i])
+    }
+    formData.append('mode', currentMode)
+
+    try {
+      const res = await fetch('http://localhost:3000/analyze-multiple', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + token },
+        body: formData
+      })
+      const data = await res.json()
+      if (data.error) throw new Error(data.error)
+
+      multiResults = data.results || []
+      completeProgress()
+      renderAccordion()
+
+      let successCount = 0
+      let totalSize = 0
+      for (let i = 0; i < multiResults.length; i++) {
+        const r = multiResults[i]
+        const matchFile = currentFiles[i]
+        const size = matchFile ? matchFile.size : 0
+        totalSize += size
+        if (!r.error) successCount++
+      }
+      stats.count += multiResults.length
+      stats.success += successCount
+      stats.size += totalSize / 1024 / 1024
+      updateStatsDisplay()
+      loadHistory()
+      showToast(successCount + ' of ' + multiResults.length + ' files analyzed', successCount === multiResults.length ? 'success' : 'info')
+    } catch (err) {
+      completeProgress()
+      document.getElementById('accordionList').innerHTML = '<div class="accordion-item"><div class="accordion-body open error">' + err.message + '</div></div>'
+      showToast('Analysis failed', 'error')
+    }
+    setLoading(false)
+  }
+
+  function renderAccordionLoading() {
+    let html = ''
+    for (let i = 0; i < currentFiles.length; i++) {
+      html += '<div class="accordion-item"><div class="accordion-header"><span class="accordion-title">' + currentFiles[i].name + '</span><span class="accordion-status">Analyzing...</span></div></div>'
+    }
+    document.getElementById('accordionList').innerHTML = html
+  }
+
+  function renderAccordion() {
+    let html = ''
+    for (let i = 0; i < multiResults.length; i++) {
+      const r = multiResults[i]
+      const isError = !!r.error
+      const statusBadge = isError
+        ? '<span class="accordion-status status-error">Error</span>'
+        : '<span class="accordion-status status-done">Done</span>'
+      const body = isError ? r.error : r.result
+      html +=
+        '<div class="accordion-item">' +
+          '<div class="accordion-header" onclick="toggleAccordion(' + i + ')">' +
+            '<span class="accordion-title">' + r.filename + '</span>' +
+            statusBadge +
+            '<span class="accordion-chevron" id="chev-' + i + '">v</span>' +
+          '</div>' +
+          '<div class="accordion-body' + (isError ? ' error' : '') + '" id="acc-body-' + i + '">' + body + '</div>' +
+        '</div>'
+    }
+    document.getElementById('accordionList').innerHTML = html
+  }
+
+  function toggleAccordion(i) {
+    const body = document.getElementById('acc-body-' + i)
+    const chev = document.getElementById('chev-' + i)
+    const isOpen = body.classList.contains('open')
+    body.classList.toggle('open', !isOpen)
+    chev.classList.toggle('open', !isOpen)
   }
 
   async function askQuestion() {
@@ -452,32 +633,33 @@
 
     try {
       const res = await fetch('http://localhost:3000/analyze', {
-  method: 'POST',
-  headers: { 'Authorization': 'Bearer ' + token },
-  body: formData
-})
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + token },
+        body: formData
+      })
       const data = await res.json()
       if (data.error) throw new Error(data.error)
       const prev = results['qa'] || ''
-      results['qa'] = prev + (prev ? '\n\n───\n\n' : '') + '❓ ' + q + '\n\n' + data.result
+      results['qa'] = prev + (prev ? '\n\n---\n\n' : '') + 'Q: ' + q + '\n\n' + data.result
       showResult('qa')
       showToast('Answer received', 'success')
     } catch (err) {
-      showError('Error: ' + err.message)
+      showError(err.message)
       showToast('Failed to get answer', 'error')
     }
     setLoading(false)
   }
+
   async function searchHistory() {
     const q = document.getElementById('searchInput').value.trim()
     if (!q) { loadHistory(); return }
     try {
-      const res = await fetch(`http://localhost:3000/search?q=${encodeURIComponent(q)}`, {
-  headers: { 'Authorization': 'Bearer ' + token }
-})
+      const res = await fetch('http://localhost:3000/search?q=' + encodeURIComponent(q), {
+        headers: { 'Authorization': 'Bearer ' + token }
+      })
       const data = await res.json()
       renderHistoryData(data)
-      showToast(`${data.length} result(s) found`, 'info')
+      showToast(data.length + ' result(s) found', 'info')
     } catch (err) {
       showToast('Search failed', 'error')
     }
@@ -486,13 +668,12 @@
   function showSkeleton() {
     const box = document.getElementById('resultBox')
     box.style.display = 'block'
-    document.getElementById('resultContent').innerHTML = `
-      <div class="skeleton" style="width:85%"></div>
-      <div class="skeleton" style="width:70%"></div>
-      <div class="skeleton" style="width:90%"></div>
-      <div class="skeleton" style="width:55%"></div>
-      <div class="skeleton" style="width:75%"></div>
-    `
+    document.getElementById('resultContent').innerHTML =
+      '<div class="skeleton" style="width:85%"></div>' +
+      '<div class="skeleton" style="width:70%"></div>' +
+      '<div class="skeleton" style="width:90%"></div>' +
+      '<div class="skeleton" style="width:55%"></div>' +
+      '<div class="skeleton" style="width:75%"></div>'
     document.getElementById('ratingBox').style.display = 'none'
     document.getElementById('cloudBox').style.display = 'none'
   }
@@ -503,14 +684,18 @@
     document.getElementById('cloudLink').textContent = data.cloudUrl
     document.getElementById('downloadBtn').href = data.cloudUrl
     const imgPreview = document.getElementById('imgPreview')
-    if (data.isImage) { imgPreview.src = data.cloudUrl; imgPreview.style.display = 'block' }
-    else imgPreview.style.display = 'none'
+    if (data.isImage) {
+      imgPreview.src = data.cloudUrl
+      imgPreview.style.display = 'block'
+    } else {
+      imgPreview.style.display = 'none'
+    }
   }
 
   function copyLink() {
     if (!currentCloudData) return
     navigator.clipboard.writeText(currentCloudData.url)
-    showToast('Link copied 📋', 'success')
+    showToast('Link copied', 'success')
   }
 
   async function deleteFile() {
@@ -518,15 +703,15 @@
     if (!confirm('Delete this file from Cloud?')) return
     try {
       const encodedId = encodeURIComponent(currentCloudData.publicId)
-      const res = await fetch(`http://localhost:3000/file/${encodedId}?resourceType=${currentCloudData.resourceType}`, {
-  method: 'DELETE',
-  headers: { 'Authorization': 'Bearer ' + token }
-})
+      const res = await fetch('http://localhost:3000/file/' + encodedId + '?resourceType=' + currentCloudData.resourceType, {
+        method: 'DELETE',
+        headers: { 'Authorization': 'Bearer ' + token }
+      })
       const data = await res.json()
       if (data.error) throw new Error(data.error)
       document.getElementById('cloudBox').style.display = 'none'
       currentCloudData = null
-      showToast('File deleted from Cloud 🗑️', 'info')
+      showToast('File deleted from Cloud', 'info')
     } catch (err) {
       showToast('Delete failed: ' + err.message, 'error')
     }
@@ -541,7 +726,7 @@
     document.getElementById('ratingBox').style.display = 'flex'
     document.getElementById('progress').style.display = 'none'
     currentRating = 0
-    document.querySelectorAll('.star').forEach(s => s.classList.remove('active'))
+    document.querySelectorAll('.star').forEach(function (s) { s.classList.remove('active') })
     document.getElementById('ratingMsg').textContent = ''
   }
 
@@ -558,29 +743,28 @@
   function setLoading(on) {
     const btn = document.getElementById('analyzeBtn')
     btn.disabled = on
-    btn.textContent = on ? '⏳ Analyzing...' : '✨ Analyze with AI'
+    btn.textContent = on ? 'Analyzing...' : 'Analyze with AI'
     if (!on) document.getElementById('progress').style.display = 'none'
   }
 
-  function updateStats(success) {
+  function updateStats(success, sizeBytes) {
     stats.count++
     if (success) stats.success++
-    if (currentFile) stats.size += currentFile.size / 1024 / 1024
+    stats.size += sizeBytes / 1024 / 1024
+    updateStatsDisplay()
+  }
+
+  function updateStatsDisplay() {
     document.getElementById('totalCount').textContent = stats.count
     document.getElementById('totalSize').textContent = stats.size.toFixed(1)
     document.getElementById('totalSuccess').textContent = stats.success
   }
 
-  function addHistory(name, size, success) {
-    history.unshift({ name, size, success, time: new Date().toLocaleTimeString('en-US') })
-    loadHistory()
-  }
-
   async function loadHistory() {
     try {
       const res = await fetch('http://localhost:3000/history', {
-  headers: { 'Authorization': 'Bearer ' + token }
-})
+        headers: { 'Authorization': 'Bearer ' + token }
+      })
       const data = await res.json()
       renderHistoryData(data)
     } catch (err) {
@@ -594,16 +778,21 @@
       list.innerHTML = '<div class="history-empty">No files analyzed yet</div>'
       return
     }
-    list.innerHTML = data.map(h => `
-      <div class="history-item">
-        <div style="font-size:24px">${fileIcons[h.filename.split('.').pop().toLowerCase()] || '📄'}</div>
-        <div class="history-info">
-          <div class="history-name">${h.filename}</div>
-          <div class="history-meta">${(h.filesize/1024/1024).toFixed(1)} MB · ${h.created_at.slice(11,16)} · ${h.mode}</div>
-        </div>
-        <span class="status-done">✅ Done</span>
-      </div>
-    `).join('')
+    let html = ''
+    for (let i = 0; i < data.length; i++) {
+      const h = data[i]
+      const ext = h.filename.split('.').pop().toLowerCase()
+      html +=
+        '<div class="history-item">' +
+          '<div style="font-size:12px;font-weight:600;color:var(--text-muted);min-width:32px">' + (fileIcons[ext] || 'FILE') + '</div>' +
+          '<div class="history-info">' +
+            '<div class="history-name">' + h.filename + '</div>' +
+            '<div class="history-meta">' + (h.filesize / 1024 / 1024).toFixed(1) + ' MB - ' + h.created_at.slice(11, 16) + ' - ' + h.mode + '</div>' +
+          '</div>' +
+          '<span class="status-done">Done</span>' +
+        '</div>'
+    }
+    list.innerHTML = html
   }
 
   loadHistory()
